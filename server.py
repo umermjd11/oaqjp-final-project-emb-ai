@@ -1,23 +1,30 @@
-from flask import Flask, request, jsonify, render_template
+"""Emotion Detection Flask Application"""
+
+from flask import Flask, request, render_template
 from EmotionDetection import emotion_detector
 
 app = Flask("Emotion Detection")
 
 @app.route('/')
 def home():
+    """Render the home page."""
     return render_template('index.html')
 
 @app.route('/emotionDetector', methods=['GET'])
 def detect_emotion():
-    
-     
-    text=request.args.get('textToAnalyze', '')
+    """Detect emotion from text provided in query parameter."""
+    text = request.args.get('textToAnalyze', '')
     result = emotion_detector(text)
-    result = emotion_detector(text)
-    return f"For the given statement, the system response is 'anger': {result['anger']}, 'disgust': {result['disgust']}, 'fear': {result['fear']}, 'joy': {result['joy']} and 'sadness': {result['sadness']}. The dominant emotion is {result['dominant_emotion']}."
+    if result['dominant_emotion'] is None:
+        return "Invalid text! Please try again!."
+    response = (f"For the given statement, the system response is 'anger': {result['anger']}, "
+                f"'disgust': {result['disgust']}, 'fear': {result['fear']}, 'joy': {result['joy']} "
+                f"and 'sadness': {result['sadness']}. "
+                f"The dominant emotion is {result['dominant_emotion']}.")
+
+
+
+    return response
 
 if __name__ == "__main__":
-    '''This function executes the flask app and deploys it on localhost:5000 in debug mode, 
-    which allows for easier troubleshooting and development. The host is set to "0.0.0.0" 
-    to allow external connections.'''
     app.run(host="0.0.0.0", port=5000, debug=True)
